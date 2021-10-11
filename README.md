@@ -1,5 +1,5 @@
 Hello! 
-My name is David Foden Martinez a React-JS & C# programmer, I'm slowly facing programming interplanto dreaming,
+My name is David a React-JS & C# programmer working for Offkey both in video games and React, I'm slowly facing programming interplanto dreaming,
 where your dream world becomes a playground of random increable items to create.
 
 All my projects are right now private if you are inteasted to see what I have created and am creating then let me know though any socal media platforms.
