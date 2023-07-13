@@ -9,7 +9,8 @@ In the vast and seemingly endless cosmos, a series of encrypted signals were int
 The signals were a call for help, a plea to resolve some tricky, mind-boggling tech conundrums that even the most sophisticated Keplerian tech geniuses were struggling with. Always up for a challenge and fueled by an unending curiosity, I embarked on an interstellar journey to assist these extraterrestrial beings.
 
 ## Meet the Teletubbians 
-![An example image](./empress "Empress Golden LaLa")
+<img src="./TeletubbieGold1.png" width="100" height="100" style="margin: 10;"><img src="./TeletubbieGold1.png" width="100" height="100" style="margin: 10;"><img src="./TeletubbieGold1.png" width="100" height="100">
+
 
 Once I landed on Kepler-452b, to my utter surprise, I was greeted by none other than the Teletubbians! Yes, you read it right, those adorable creatures we adored on television, were, in fact, aliens from this far-off planet. Who would've guessed!
 
