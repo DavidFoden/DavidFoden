@@ -8,6 +8,8 @@ In the vast and seemingly endless cosmos, a series of encrypted signals were int
 
 The signals were a call for help, a plea to resolve some tricky, mind-boggling tech conundrums that even the most sophisticated Keplerian tech geniuses were struggling with. Always up for a challenge and fueled by an unending curiosity, I embarked on an interstellar journey to assist these extraterrestrial beings.
 
+![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=DavidFoden&show_icons=true&theme=radical)
+
 ## Meet the Teletubbians 
 <img src="./TeletubbieGold1.png" width="100" height="100" style="margin: 10;"><img src="./FirstGrandson.png" width="100" height="100" style="margin: 10;"><img src="./TinkyLa.png" width="100" height="100">
 
