@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deepholt — a field guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --limestone:#D6DAD0; --paper:#E2E5DC;
+    --peat:#241F1A; --peat-soft:#524A42;
+    --malachite:#3D6B52; --ochre:#B5811F; --rust:#9A452B; --slate:#4C6472;
+    --rule:#A9AFA1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--limestone);color:var(--peat);
+       font-family:Archivo,system-ui,sans-serif;font-size:15.5px;line-height:1.6}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 70px}
+  h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(40px,7vw,68px);
+     line-height:.95;margin:0;letter-spacing:-.02em}
+  .standfirst{color:var(--peat-soft);max-width:56ch;margin:14px 0 0;font-size:17px}
+
+  /* the placard — the most characteristic object in this world */
+  .placard{
+    margin:44px 0 0;padding:34px 30px;background:var(--peat);color:var(--paper);
+    border-radius:2px;position:relative;
+  }
+  .placard p{font-family:'Zilla Slab',serif;font-size:clamp(21px,3.4vw,31px);
+             line-height:1.35;margin:0;max-width:24ch}
+  .placard .gloss{font-family:Archivo,sans-serif;font-size:14px;color:#A9AFA1;
+                  margin-top:22px;max-width:52ch;line-height:1.6}
+  .rivet{position:absolute;width:7px;height:7px;border-radius:50%;background:#6b625a}
+  .rivet.a{top:13px;left:13px}.rivet.b{top:13px;right:13px}
+  .rivet.c{bottom:13px;left:13px}.rivet.d{bottom:13px;right:13px}
+
+  h2{font-family:'Zilla Slab',serif;font-weight:500;font-size:26px;margin:64px 0 6px;
+     padding-bottom:8px;border-bottom:2px solid var(--peat)}
+  .lede{color:var(--peat-soft);max-width:62ch;margin:12px 0 26px}
+
+  .maprow{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:start}
+  @media(max-width:820px){.maprow{grid-template-columns:1fr}}
+  svg{width:100%;height:auto;display:block}
+  .cname{font-size:11.5px;font-weight:600;fill:var(--peat)}
+  .cprey{font-size:9.5px;fill:var(--peat-soft)}
+  .tun{stroke:var(--peat-soft);stroke-width:3;stroke-linecap:round}
+  .tun.broken{stroke:var(--rust);stroke-width:3.5;stroke-dasharray:7 5}
+  .keyrow{display:flex;gap:9px;align-items:flex-start;padding:9px 0;
+          border-bottom:1px solid var(--rule);font-size:14px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;margin-top:5px}
+  .keyrow span.k{color:var(--peat-soft)}
+
+  .camps{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  @media(max-width:760px){.camps{grid-template-columns:1fr}}
+  .camp{border-top:3px solid var(--peat);padding-top:14px}
+  .camp h3{font-family:'Zilla Slab',serif;font-weight:600;font-size:22px;margin:0}
+  .creed{display:inline-block;margin:8px 0 12px;padding:3px 9px;border-radius:2px;
+         font-size:12.5px;font-weight:600;color:var(--paper)}
+  .camp p{margin:0 0 12px}
+  .camp dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px}
+  .camp dt{color:var(--peat-soft)}
+  .camp dd{margin:0}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-weight:600;border-bottom:2px solid var(--peat);padding:8px 10px 8px 0}
+  td{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  td.n{color:var(--peat-soft)}
+
+  .pull{font-family:'Zilla Slab',serif;font-size:22px;line-height:1.4;
+        border-left:4px solid var(--rust);padding:4px 0 4px 20px;margin:34px 0;max-width:44ch}
+  footer{margin-top:60px;padding-top:16px;border-top:1px solid var(--rule);
+         color:var(--peat-soft);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Deepholt</h1>
+<p class="standfirst">A sealed dwarven biosphere, unattended for four hundred years. Fifteen chambers, four cultures, one broken ceiling. A field guide for the design team.</p>
+
+<div class="placard">
+  <span class="rivet a"></span><span class="rivet b"></span>
+  <span class="rivet c"></span><span class="rivet d"></span>
+  <p>When the ceiling opens, those who fall are to be conducted to the cistern.</p>
+  <p class="gloss">Recovered from a dwarven wall plate. Recopied by illiterates for four centuries and now held, in four differing versions, as scripture. It was an evacuation procedure. The peasants have not been mistaken for messiahs. They have been mistaken for a plumbing callout.</p>
+</div>
+
+<h2>The cavern</h2>
+<p class="lede">The dwarves built cisterns, air shafts, fungus farms and livestock pens, then died or left. The system kept running unattended. Every creature down here descends from dwarven labour, livestock or vermin — all of them fighting over infrastructure none of them can rebuild.</p>
+
+<div class="maprow">
+  <figure style="margin:0">
+    <svg viewBox="0 0 900 620" role="img" aria-label="Map of Deepholt"></svg>
+  </figure>
+  <div>
+    <div class="keyrow"><span class="dot" style="background:var(--malachite)"></span>
+      <span><b>Sporewardens</b> — the Fungal Deep. <span class="k">Devout. The prize chamber and the softest defenders.</span></span></div>
+    <div class="keyrow"><span class="dot" style="background:var(--rust)"></span>
+      <span><b>Ashfang goblins</b> — the Ashvents. <span class="k">Belligerent, numerous, quick to copy any tool they see.</span></span></div>
+    <div class="keyrow"><span class="dot" style="background:var(--slate)"></span>
+      <span><b>Mirelurk clan</b> — the Black Sump. <span class="k">Fishers and traders. Sell the prophecy, don't buy it.</span></span></div>
+    <div class="keyrow"><span class="dot" style="background:var(--ochre)"></span>
+      <span><b>Assayers</b> — Dragonspine Ridge. <span class="k">Poor, few, deeply dug in. They have their own god.</span></span></div>
+    <div class="keyrow"><span class="dot" style="background:var(--peat);border-radius:1px"></span>
+      <span><b>The Sealed Gate</b> <span class="k">— dead rock, and the way the dwarves left. Whatever holds it shut has held for four hundred years.</span></span></div>
+    <div class="keyrow"><span class="dot" style="background:var(--rust);border-radius:1px"></span>
+      <span><b>The new fissure</b> <span class="k">— opened by the earthquake. Tick zero. The players fall through it and the equilibrium ends.</span></span></div>
+  </div>
+</div>
+
+<h2>The four camps</h2>
+<p class="lede">Each differs in culture, intelligence, creed and taboo. Intelligence is not flavour — it decides how many actions a camp can even see. The dim ones react to hunger. The cunning ones negotiate, extort and betray.</p>
+
+<div class="camps" id="camps"></div>
+
+<p class="pull">The goblins hunted the ridge too hard, so the dragon starved. Nobody wrote that.</p>
+
+<h2>The food webs</h2>
+<p class="lede">Every chamber runs flora, a prey species and sometimes a predator. Camps hunt named animals, not a resource bar. Hunt a chamber out and it collapses — then recovers, if anyone leaves it alone long enough. The party eats from the same web, which is how four peasants wreck an ecosystem simply by being hungry.</p>
+
+<table>
+  <thead><tr><th>Chamber</th><th>Flora</th><th>Prey</th><th>Apex</th><th>Character</th></tr></thead>
+  <tbody id="eco"></tbody>
+</table>
+
+<h2>How a season goes wrong</h2>
+<p class="lede">Taken from an actual prototype run, seed 7. None of it was scripted.</p>
+<table>
+  <thead><tr><th style="width:70px">Tick</th><th>Event</th></tr></thead>
+  <tbody>
+    <tr><td class="n">6</td><td>The ridge dragon falls on the Assayers in Dragonspine Ridge. One does not return.</td></tr>
+    <tr><td class="n">16</td><td>The crag goats of Dragonspine Ridge collapse. The blindfish of the Black Sump collapse the same tick.</td></tr>
+    <tr><td class="n">31</td><td>The glowslugs of the Fungal Deep collapse — the richest chamber in Deepholt is hunted out.</td></tr>
+    <tr><td class="n">33</td><td>The Mirelurk clan raid the Sporewardens at the Fungal Deep and take the field.</td></tr>
+    <tr><td class="n">40</td><td>The glowslugs return.</td></tr>
+    <tr><td class="n">51</td><td>The ridge dragon starves out of Dragonspine Ridge. Nobody killed it. They ate its food.</td></tr>
+    <tr><td class="n">52</td><td>The Sporewardens are no more.</td></tr>
+    <tr><td class="n">53</td><td>The Ashfang abandon the Ashvents and settle the Fungal Deep.</td></tr>
+  </tbody>
+</table>
+
+<h2>When faith breaks</h2>
+<p class="lede">The Sporewardens are the camp players befriend first, which makes them the camp most likely to be disappointed. Faith erodes on specific acts — a taboo broken, a promise unkept, a sacred chamber hunted out — each logged at the time in words the player can't yet read.</p>
+<p class="lede">When it snaps, fervour suppresses foraging, migration and defence, and multiplies one score: reach the party. They will hunt you while starving, because failed prophecy intensifies belief rather than ending it. The camp splits — hardliners who want you dead, a remnant who insists the sign still holds. That remnant is the only way back.</p>
+<p class="lede">And a camp that ignores hunger dies. Its hunting grounds go unworked, its neighbours' balance shifts, and the fallout crosses the map. You didn't make an enemy. You doomed them.</p>
+
+<footer>Those Who Fell — world guide v0.1. Names in this document are provisional. Timeline events are real output from the headless prototype, not written fiction.</footer>
+
+</div>
+<script>
+const CH=[
+ {k:'fissure',n:'The Fissure',      x:130,y:70, r:14,hold:null,flora:'rubble weed', prey:'—',             apex:'—',note:'Where the party lands. Nothing lives here yet.'},
+ {k:'rubble', n:'Rubble Stair',     x:290,y:62, r:16,hold:null,flora:'dust fungus', prey:'rock mites',    apex:'—',note:'A collapsed stairway. The quickest way east, and so the quickest way to the Ashfang.'},
+ {k:'hollow', n:'Grimhollow',       x:120,y:210,r:29,hold:null,flora:'pale lichen', prey:'cave rothe',    apex:'—',note:'Rich, unclaimed, and everyone\u2019s famine buffer. The first thing worth fighting over.'},
+ {k:'ashvent',n:'The Ashvents',     x:420,y:95, r:22,hold:'#9A452B',flora:'ash moss',prey:'ember beetles',apex:'—',note:'Thin and poor. The Ashfang are aggressive because they live badly.'},
+ {k:'ember',  n:'Ember Galleries',  x:590,y:60, r:20,hold:null,flora:'cinder mould',prey:'slag crickets', apex:'—',note:'Cold forge halls. Scrap worth trading, and the only source of anything like a weapon.'},
+ {k:'fungal', n:'The Fungal Deep',  x:760,y:165,r:38,hold:'#3D6B52',flora:'fungal mats',prey:'glowslugs', apex:'—',note:'The prize. Vast yield, no predator, and defenders who have never had to fight.'},
+ {k:'terrace',n:'Spore Terraces',   x:820,y:315,r:30,hold:null,flora:'terrace caps',prey:'pale grubs',    apex:'—',note:'Sacred growing beds. Hunt here and Sporewarden faith begins to erode.'},
+ {k:'cistern',n:'The Cistern',      x:450,y:305,r:21,hold:'X',flora:'water weed',  prey:'cistern shrimp', apex:'—',note:'The regulator. It decides what grows where, so it decides who eats.'},
+ {k:'gallery',n:'The Long Gallery', x:280,y:310,r:15,hold:null,flora:'floor lichen',prey:'—',             apex:'—',note:'Four ways out, no food, no cover. Everyone passes through and nobody stays.'},
+ {k:'kiln',   n:'The Kiln',         x:120,y:375,r:16,hold:null,flora:'soot fungus', prey:'rock mites',    apex:'—',note:'The hermit lives here. The only creature in Deepholt who can read dwarven script.'},
+ {k:'gate',   n:'The Sealed Gate',  x:70, y:495,r:14,hold:null,flora:'dust fungus', prey:'—',             apex:'—',note:'The way the dwarves left. Not rusted shut \u2014 held. Getting through it is the ending.'},
+ {k:'spine',  n:'Dragonspine Ridge',x:210,y:530,r:24,hold:'#B5811F',flora:'stone lichen',prey:'crag goats',apex:'the ridge dragon',note:'Poor and dangerous, and the most defensible ground down here.'},
+ {k:'weeping',n:'Weeping Stair',    x:430,y:530,r:18,hold:null,flora:'drip moss',   prey:'cave newts',    apex:'—',note:'Wet, loud, and the worst place to be caught by anything hunting by sound.'},
+ {k:'sump',   n:'The Black Sump',   x:630,y:495,r:32,hold:'#4C6472',flora:'algal scum',prey:'blindfish',  apex:'ripper eels',note:'Three ways in and hard to hold, which made the Mirelurks traders rather than fighters.'},
+ {k:'stacks', n:'Drowned Stacks',   x:815,y:470,r:26,hold:null,flora:'flood weed',  prey:'silt crabs',    apex:'—',note:'Flooded storage towers. Good fishing, if you will share the water with the eels.'}
+];
+const E=[['fissure','rubble'],['fissure','hollow'],['rubble','ashvent'],['rubble','ember'],
+ ['hollow','gallery'],['hollow','kiln'],['ashvent','ember'],['ashvent','cistern'],
+ ['ember','fungal'],['fungal','terrace'],['fungal','cistern'],['terrace','stacks'],
+ ['terrace','sump'],['cistern','gallery'],['cistern','weeping'],['cistern','sump'],
+ ['gallery','kiln'],['gallery','weeping'],['kiln','gate'],['gate','spine'],
+ ['spine','weeping'],['weeping','sump'],['sump','stacks']];
+const CAMPS=[
+ {n:'The Sporewardens',c:'#3D6B52',creed:'Devout',
+  d:'Pale, near-blind descendants of the dwarven farmhands, still tending mats their ancestors were assigned to. Well fed, numerous and almost undefended \u2014 they have never needed to fight for the richest chamber in Deepholt. In simulation they are usually the first camp to be raided by everybody.',
+  home:'The Fungal Deep',intel:'Middling \u2014 they negotiate, but do not scheme',taboo:'Will not burn fungus, for any reason'},
+ {n:'The Ashfang goblins',c:'#9A452B',creed:'Opportunist',
+  d:'Descended from the labour gangs. They live on thin ground and are permanently one bad season from starving, which makes them the most aggressive thing in the cavern. They also copy any tool they are shown. Leave a quiver lying about and it comes back at you.',
+  home:'The Ashvents',intel:'Low \u2014 they react to hunger, they do not plan',taboo:'None. That is rather the problem.'},
+ {n:'The Mirelurk clan',c:'#4C6472',creed:'Indifferent',
+  d:'Amphibious fishers who trade with everyone and believe nothing. They will sell the prophecy to camps that do believe it, and sell you to those camps if the price is right. The most dangerous camp to negotiate with, because they are the only ones negotiating back.',
+  home:'The Black Sump',intel:'High \u2014 the full menu: tribute, alliance, betrayal',taboo:'Debts are recorded and always collected'},
+ {n:'The Assayers',c:'#B5811F',creed:'Rival faith',
+  d:'Kobolds who venerate the ridge dragon and read the ceiling prophecy as heresy. Few, poor, and dug into the most defensible ground in Deepholt. Their devotion is visibly self-destructive: they will not touch the dragon\u2019s goats even while their own starve.',
+  home:'Dragonspine Ridge',intel:'Middling \u2014 devout logic overrides need',taboo:'The dragon\u2019s prey is not food'}
+];
+const at=k=>CH.find(c=>c.k===k);
+let s='';
+E.forEach(([a,b])=>{const p=at(a),q=at(b);
+  s+=`<line class="tun" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`});
+s+=`<line class="tun broken" x1="${at('fissure').x}" y1="10" x2="${at('fissure').x}" y2="${at('fissure').y-14}"/>`;
+s+=`<text class="cprey" x="${at('fissure').x+12}" y="18" fill="#9A452B" style="font-weight:600">you fall in here</text>`;
+CH.forEach(c=>{
+  const held=c.hold&&c.hold!=='X';
+  s+=`<g><circle cx="${c.x}" cy="${c.y}" r="${c.r}" fill="rgba(61,107,82,.22)"
+        stroke="${held?c.hold:'#241F1A'}" stroke-width="${held?4:2}"/>
+      <text class="cname" x="${c.x}" y="${c.y+c.r+15}" text-anchor="middle">${c.n}</text>
+      ${c.prey!=='—'?`<text class="cprey" x="${c.x}" y="${c.y+c.r+27}" text-anchor="middle">${c.prey}</text>`:''}
+      ${c.hold==='X'?`<text class="cprey" x="${c.x}" y="${c.y+4}" text-anchor="middle" style="font-weight:600">the regulator</text>`:''}</g>`;
+});
+document.querySelector('svg').setAttribute('viewBox','0 0 900 620');
+document.querySelector('svg').innerHTML=s;
+
+document.getElementById('camps').innerHTML=CAMPS.map(c=>`
+  <article class="camp" style="border-color:${c.c}">
+    <h3>${c.n}</h3>
+    <span class="creed" style="background:${c.c}">${c.creed}</span>
+    <p>${c.d}</p>
+    <dl><dt>Home</dt><dd>${c.home}</dd><dt>Intelligence</dt><dd>${c.intel}</dd>
+        <dt>Taboo</dt><dd>${c.taboo}</dd></dl>
+  </article>`).join('');
+
+document.getElementById('eco').innerHTML=CH.map(c=>`
+  <tr><td><b>${c.n}</b></td><td class="n">${c.flora}</td><td class="n">${c.prey}</td>
+      <td class="n">${c.apex}</td><td>${c.note}</td></tr>`).join('');
+</script>
+</body>
+</html>

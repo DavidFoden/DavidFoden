@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deepholt — bands</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--limestone:#D6DAD0;--peat:#241F1A;--peat-soft:#524A42;
+        --malachite:#3D6B52;--ochre:#B5811F;--rust:#9A452B;--slate:#4C6472;--rule:#A9AFA1}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--limestone);color:var(--peat);
+       font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.55;
+       font-variant-numeric:tabular-nums}
+  .wrap{max-width:1300px;margin:0 auto;padding:30px 22px 60px}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;
+         border-bottom:2px solid var(--peat);padding-bottom:12px}
+  h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:36px;margin:0;line-height:1}
+  .standfirst{color:var(--peat-soft);max-width:64ch;margin:0}
+  .tickread{margin-left:auto;font-family:'Zilla Slab',serif;font-size:26px}
+  .tickread span{font-family:Archivo,sans-serif;font-size:14px;color:var(--peat-soft)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+            padding:13px 0;border-bottom:1px solid var(--rule);margin-bottom:20px}
+  button{font:inherit;font-weight:500;background:transparent;color:var(--peat);
+         border:1.5px solid var(--peat);border-radius:2px;padding:7px 14px;cursor:pointer}
+  button:hover{background:var(--peat);color:var(--limestone)}
+  button:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  button.primary{background:var(--peat);color:var(--limestone)}
+  button.primary:hover{background:var(--rust);border-color:var(--rust)}
+  .seedbox{display:flex;gap:7px;align-items:center;margin-left:auto;color:var(--peat-soft)}
+  input[type=number]{font:inherit;width:66px;padding:6px 8px;border:1.5px solid var(--rule);
+                     border-radius:2px;background:#fff;color:var(--peat)}
+  .stage{display:grid;grid-template-columns:1.5fr 1fr;gap:32px;align-items:start}
+  @media(max-width:920px){.stage{grid-template-columns:1fr}}
+  svg{width:100%;height:auto;display:block}
+  .link{stroke:#8E9589;stroke-width:2.5;stroke-linecap:round}
+  .node circle.body{stroke:#241F1A;stroke-width:2}
+  .node text.label{font-size:12px;font-weight:600;fill:var(--peat)}
+  .node text.sub{font-size:10px;fill:var(--peat-soft)}
+  .node text.dead{fill:var(--rust);font-weight:600}
+  .bandmark{stroke:#241F1A;stroke-width:1.2}
+  .bandwar{stroke:#241F1A;stroke-width:2.2}
+  .bandlabel{font-size:9px;font-weight:600;pointer-events:none}
+  .panel{margin-top:20px;border-top:2px solid var(--peat);padding-top:12px}
+  .panel h3{font-family:'Zilla Slab',serif;font-weight:500;font-size:17px;margin:0 0 8px}
+  .row{display:grid;grid-template-columns:13px 1fr auto auto auto;gap:11px;align-items:center;
+       padding:8px 0;border-bottom:1px solid var(--rule)}
+  .swatch{width:11px;height:11px;border-radius:50%}
+  .where{color:var(--peat-soft);font-size:13px}
+  .stat{font-family:'Zilla Slab',serif;font-size:17px}
+  .stat em{font-style:normal;font-size:12px;color:var(--peat-soft);font-family:Archivo,sans-serif}
+  .out{color:var(--rust)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;font-weight:600;border-bottom:2px solid var(--peat);padding:7px 8px 7px 0}
+  td{padding:6px 8px 6px 0;border-bottom:1px solid var(--rule)}
+  td.n{color:var(--peat-soft)}
+  h2{font-family:'Zilla Slab',serif;font-weight:500;font-size:19px;margin:0 0 10px}
+  .log{height:660px;overflow-y:auto;border-top:2px solid var(--peat);
+       border-bottom:1px solid var(--rule);padding:4px 0}
+  .entry{display:grid;grid-template-columns:36px 1fr;gap:11px;padding:5px 2px;font-size:13.5px;
+         border-bottom:1px solid rgba(169,175,161,.45)}
+  .entry .t{color:var(--peat-soft);font-size:12px;padding-top:2px}
+  .entry.war{background:rgba(154,69,43,.09)}
+  .entry.war .body{color:var(--rust);font-weight:500}
+  .entry.big{background:var(--peat)}
+  .entry.big .body{color:var(--limestone);font-weight:600}
+  .entry.big .t{color:#C3C9BD}
+  .entry.move .body{color:var(--slate);font-weight:500}
+  .entry.march .body{color:var(--peat-soft)}
+  .entry.eco .body{color:var(--malachite);font-weight:500}
+  .empty{padding:20px 4px;color:var(--peat-soft);max-width:40ch}
+  .bar{height:8px;background:rgba(36,31,26,.12);position:relative;border-radius:1px}
+  .bar i{position:absolute;left:0;top:0;bottom:0;display:block;border-radius:1px}
+  .bar i.flora{background:var(--malachite)}
+  .bar i.prey{background:var(--ochre)}
+  td.crash{color:var(--rust);font-weight:600}
+  tr.seedrow{cursor:pointer}
+  tr.seedrow:hover td{background:rgba(36,31,26,.06)}
+  tr.seedrow td:first-child{font-family:'Zilla Slab',serif;font-size:16px}
+  .char{font-weight:500}
+  .panel.survey{margin:0 0 22px;border-top:3px solid var(--rust);padding-top:14px}
+  .panel.survey h3{color:var(--rust)}
+  td.gone{color:var(--peat-soft);font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Deepholt</h1>
+    <p class="standfirst">Embodiment. Camp decisions no longer resolve inside a tick — they send out bands that walk, work and come home. A camp with people in the field is a camp that cannot defend itself.</p>
+  </div>
+  <div class="tickread" id="tickread">0 <span>ticks</span></div>
+</header>
+
+<div class="controls">
+  <button id="step">Advance one tick</button>
+  <button id="run" class="primary">Run</button>
+  <button id="reset">Start over</button>
+  <button id="survey">Survey twelve seeds</button>
+  <div class="seedbox"><label for="seed">Seed</label>
+    <input type="number" id="seed" value="7" min="0" max="9999"></div>
+</div>
+
+<div class="panel survey" id="surveypanel" style="display:none">
+      <h3>What each seed does <span class="where" style="font-weight:400">— 250 ticks, no player. Click one to load it.</span></h3>
+      <table><thead><tr><th>Seed</th><th>Character</th><th>Wars</th><th>Hunted out</th><th>Beasts move</th><th>Ends with</th></tr></thead>
+      <tbody id="surveyrows"></tbody></table>
+    </div>
+
+<div class="stage">
+  <div>
+    <svg id="map" viewBox="0 0 900 640" role="img" aria-label="Deepholt with bands in the field"></svg>
+    <p class="standfirst" style="margin-top:10px;font-size:13.5px">Chamber fill shows how much is growing; the label underneath is the standing herd. Small dots on the tunnels are bands — hollow rings hunt, solid rings are war bands. A camp's marker shrinks while its people are away.</p>
+    <div class="panel"><h3>Camps</h3><div id="roster"></div></div>
+    <div class="panel"><h3>In the field</h3><table><tbody id="bands"></tbody></table></div>
+    <div class="panel"><h3>Ecology</h3>
+      <table>
+        <thead><tr><th>Chamber</th><th>Flora</th><th style="width:76px"></th><th>Prey</th><th style="width:76px"></th><th>Apex</th><th>Held</th></tr></thead>
+        <tbody id="eco"></tbody>
+      </table>
+    </div>
+  </div>
+  <section>
+    <h2>Chronicle</h2>
+    <div class="log" id="log"><p class="empty">Nothing has happened yet. Advance a tick.</p></div>
+  </section>
+</div>
+
+</div>
+<script>
+// ===========================================================================
+// TUNING
+// ===========================================================================
+const W={hungerHunt:2.4,hungerForage:1.2,weakTempts:1.6,lossFortify:1.8,winRaid:0.6,
+         safeGrow:1.6,curiosity:0.6,raidReluctance:1.2,warWeariness:1.2,lootTempts:1.0,
+         hungerMigrate:2.0,hungerRaid:1.2,contestedGround:1.1,marchCost:0.9,expansion:2.6};
+const NOISE=0.32, FOOD_PER_POP=0.5, RAID_LOOT=0.45, CASUALTY=[0.08,0.18];
+const GRAZE=0.55, PREY_BIRTH=0.30, PRED_KILL=0.7, PRED_BIRTH=0.10, PRED_DEATH=0.06;
+const HUNT_SHARE=0.30, MEAT=3.0;
+const MIN_POP=2.5;
+// A dragon has been on that ridge for four hundred years. Attrition reduces an
+// apex to a single gaunt animal that roams and recovers — it does not erase it.
+const MIN_PRED=0.5;
+
+// -- embodiment --------------------------------------------------------------
+const HUNT_WORK=2, ASSAULT_WORK=1, SETTLE_WORK=3;
+const BAND_HUNT_SHARE=[0.25,0.40], BAND_RAID_SHARE=[0.50,0.70];
+const MIN_BAND=2, MAX_BANDS_PER_CAMP=3, MIN_GARRISON_TO_SEND=3;
+const PROVISION_PER_MEMBER=0.06;
+const FORCE_MARCH_SPEED=2, FORCE_MARCH_PENALTY=0.7, FORCE_MARCH_TICKS=3;
+
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+const CHAMBER_DEFS=[
+ {key:'fissure',name:'The Fissure',       x:130,y:70,  def:.1, slow:1.0, flora:'rubble weed',  floraCap:3,  prey:'—',              preyCap:0,  prey0:0,  apex:null},
+ {key:'rubble', name:'Rubble Stair',      x:290,y:62,  def:.3, slow:1.3, flora:'dust fungus',  floraCap:5,  prey:'rock mites',     preyCap:4,  prey0:3,  apex:null},
+ {key:'hollow', name:'Grimhollow',        x:120,y:210, def:.5, slow:0.9, flora:'pale lichen',  floraCap:26, prey:'cave rothe',     preyCap:16, prey0:12, apex:null},
+ {key:'ashvent',name:'The Ashvents',      x:420,y:95,  def:.2, slow:1.0, flora:'ash moss',     floraCap:14, prey:'ember beetles',  preyCap:11, prey0:7,  apex:null},
+ {key:'ember',  name:'Ember Galleries',   x:590,y:60,  def:.4, slow:1.0, flora:'cinder mould', floraCap:10, prey:'slag crickets',  preyCap:8,  prey0:6,  apex:null},
+ {key:'fungal', name:'The Fungal Deep',   x:760,y:165, def:.1, slow:1.1, flora:'fungal mats',  floraCap:52, prey:'glowslugs',      preyCap:30, prey0:24, apex:null},
+ {key:'terrace',name:'Spore Terraces',    x:820,y:315, def:.2, slow:1.0, flora:'terrace caps', floraCap:28, prey:'pale grubs',     preyCap:18, prey0:14, apex:null},
+ {key:'cistern',wet:true, name:'The Cistern',       x:450,y:305, def:.6, slow:0.9, flora:'water weed',   floraCap:12, prey:'cistern shrimp', preyCap:10, prey0:8,  apex:null},
+ {key:'gallery',name:'The Long Gallery',  x:280,y:310, def:.1, slow:0.6, flora:'floor lichen', floraCap:4,  prey:'—',              preyCap:0,  prey0:0,  apex:null},
+ {key:'kiln',   name:'The Kiln',          x:120,y:375, def:.4, slow:1.0, flora:'soot fungus',  floraCap:6,  prey:'rock mites',     preyCap:5,  prey0:4,  apex:null},
+ {key:'gate',   name:'The Sealed Gate',   x:70, y:495, def:.7, slow:1.0, flora:'dust fungus',  floraCap:3,  prey:'—',              preyCap:0,  prey0:0,  apex:null},
+ {key:'spine',  name:'Dragonspine Ridge', x:210,y:530, def:.8, slow:1.2, flora:'stone lichen', floraCap:26, prey:'crag goats',     preyCap:15, prey0:12, apex:{name:'the ridge dragon',pop:1.0,threat:.55,habitat:'any'}},
+ {key:'weeping',wet:true, name:'Weeping Stair',     x:430,y:530, def:.2, slow:1.4, flora:'drip moss',    floraCap:13, prey:'cave newts',     preyCap:12, prey0:9,  apex:null},
+ {key:'sump',   wet:true, name:'The Black Sump',    x:630,y:495, def:.3, slow:1.1, flora:'algal scum',   floraCap:30, prey:'blindfish',      preyCap:20, prey0:16, apex:{name:'ripper eels',pop:1.4,threat:.30,habitat:'wet'}},
+ {key:'stacks', wet:true, name:'Drowned Stacks',    x:815,y:470, def:.3, slow:1.2, flora:'flood weed',   floraCap:18, prey:'silt crabs',     preyCap:13, prey0:10, apex:null},
+ {key:'rookery',name:'The Rookery',       x:105,y:600, def:.6, slow:1.1, flora:'pallid moss',  floraCap:16, prey:'gloom bats',     preyCap:12, prey0:9,  apex:null}
+];
+const BASE_TUNNELS=[
+ ['fissure','rubble'],['fissure','hollow'],['rubble','ashvent'],['rubble','ember'],
+ ['hollow','gallery'],['hollow','kiln'],['ashvent','ember'],['ashvent','cistern'],
+ ['ember','fungal'],['fungal','terrace'],['fungal','cistern'],['terrace','stacks'],
+ ['terrace','sump'],['cistern','gallery'],['cistern','weeping'],['cistern','sump'],
+ ['gallery','kiln'],['gallery','weeping'],['kiln','gate'],['gate','spine'],
+ ['spine','weeping'],['weeping','sump'],['sump','stacks'],
+ ['spine','rookery'],['gate','rookery']
+];
+const CAMP_DEFS=[
+ {key:'ashfang',name:'the Ashfang goblins',short:'Ashfang',   home:'ashvent',pop:12,food:34,def:.2,temper:.8,colour:'#9A452B'},
+ {key:'mire',   name:'the Mirelurk clan',  short:'Mirelurk',  home:'sump',   pop:11,food:32,def:.4,temper:.3,colour:'#4C6472'},
+ {key:'spore',  name:'the Sporewardens',   short:'Sporewardens',home:'fungal',pop:13,food:38,def:.1,temper:.2,colour:'#3D6B52'},
+ {key:'assay',  name:'the Assayers',       short:'Assayers',  home:'spine',  pop:5, food:16, def:.7,temper:.6,colour:'#B5811F',venerates:'the ridge dragon'}
+];
+
+let world, timer=null;
+
+function makeWorld(seed){
+  const rng=mulberry(seed), chambers={}, camps={};
+  CHAMBER_DEFS.forEach(c=>{chambers[c.key]={...c,floraStock:c.floraCap*0.8,preyPop:c.prey0,
+    pred:c.apex?c.apex.pop:0,huntedBy:[],lastHuntedBy:[],crashed:false}});
+  CAMP_DEFS.forEach(c=>{camps[c.key]={...c,last:'none',since:99,known:new Set([c.home]),
+    holds:[c.home],lastSettle:-99,alive:true,marchPenalty:0}});
+  const w={rng,tick:0,log:[],chambers,camps,bands:[],bandId:1,
+           tunnels:BASE_TUNNELS.map(t=>t.slice()),opened:[]};
+  Object.values(camps).forEach(c=>neighbours(w,c.home).forEach(k=>c.known.add(k)));
+  return w;
+}
+const key2=(a,b)=>[a,b].sort().join('|');
+const neighbours=(w,k)=>w.tunnels.filter(t=>t.includes(k)).map(t=>t[0]===k?t[1]:t[0]);
+const living=w=>Object.values(w.camps).filter(c=>c.alive);
+const campAt=(w,k)=>living(w).find(c=>c.holds.includes(k))||null;
+const say=(w,text,kind)=>w.log.push({t:w.tick,text,kind:kind||'plain'});
+const chApex=ch=>ch.apex?ch.apex.name:'something in the dark';
+
+// sacred ground is wherever the venerated animal currently hunts
+function tabooAt(w,camp){
+  if(!camp.venerates) return [];
+  return Object.values(w.chambers)
+    .filter(ch=>ch.apex&&ch.pred>0.25&&ch.apex.name===camp.venerates)
+    .map(ch=>ch.key);
+}
+function range(w,camp){
+  const out=new Set(camp.holds);
+  camp.holds.forEach(h=>neighbours(w,h).forEach(k=>{if(camp.known.has(k))out.add(k)}));
+  return [...out];
+}
+function claimable(w,camp){
+  const out=new Set();
+  camp.holds.forEach(h=>neighbours(w,h).forEach(k=>{
+    if(camp.known.has(k)&&!campAt(w,k)&&w.chambers[k].preyCap>0) out.add(k)}));
+  return [...out];
+}
+function hops(w,a,b){
+  if(a===b) return 0;
+  const seen={[a]:0},q=[a];
+  while(q.length){const c=q.shift();
+    for(const n of neighbours(w,c)){ if(!(n in seen)){seen[n]=seen[c]+1; if(n===b) return seen[n]; q.push(n)} }}
+  return 99;
+}
+function path(w,a,b){
+  if(a===b) return [a];
+  const prev={[a]:null},q=[a];
+  while(q.length){const c=q.shift();
+    for(const n of neighbours(w,c)){ if(!(n in prev)){prev[n]=c; if(n===b){
+      const out=[b]; let x=b; while(prev[x]){x=prev[x]; out.unshift(x)} return out} q.push(n)} }}
+  return null;
+}
+
+// ===========================================================================
+// BANDS — the embodiment layer
+// ===========================================================================
+const bandsOf=(w,camp)=>w.bands.filter(b=>b.camp===camp.key);
+const away=(w,camp)=>bandsOf(w,camp).reduce((n,b)=>n+b.members,0);
+const garrison=(w,camp)=>Math.max(0,camp.pop-away(w,camp));
+const canField=(w,camp)=>garrison(w,camp)>=MIN_GARRISON_TO_SEND
+                       && bandsOf(w,camp).length<MAX_BANDS_PER_CAMP;
+// how long one tunnel takes, by the chambers at each end
+const legCost=(w,a,b)=>(w.chambers[a].slow+w.chambers[b].slow)/2;
+
+function sendBand(w,camp,purpose,target,share){
+  const route=path(w,camp.home,target);
+  if(!route) return false;
+  const g=garrison(w,camp);
+  const members=Math.max(MIN_BAND, Math.min(g-1, g*(share[0]+w.rng()*(share[1]-share[0]))));
+  if(members<MIN_BAND) return false;
+  const provisions=members*PROVISION_PER_MEMBER*route.length;
+  camp.food=Math.max(0,camp.food-provisions);
+  w.bands.push({id:w.bandId++,camp:camp.key,purpose,target,members,
+    carrying:{food:0},route,leg:0,progress:0,state:'outbound',workLeft:0,
+    departedTick:w.tick});
+  const verb = purpose==='raid' ? 'go out under arms toward'
+             : purpose==='settle' ? 'set out to claim'
+             : purpose==='migrate' ? 'break camp for'
+             : 'set out to hunt';
+  say(w,`${camp.name} ${verb} ${w.chambers[target].name}. ${members.toFixed(0)} go.`,
+      purpose==='raid'?'war':'march');
+  return true;
+}
+
+function bandArrivesHome(w,b){
+  const camp=w.camps[b.camp];
+  if(!camp.alive) return;
+  // camp.pop already includes people in the field, so only the haul comes back
+  camp.food+=b.carrying.food;
+  if(b.carrying.food>0.5)
+    say(w,`${camp.name} return to ${w.chambers[camp.home].name} with ${b.carrying.food.toFixed(0)}.`,'march');
+}
+
+function doWork(w,b){
+  const camp=w.camps[b.camp];
+  if(!camp.alive) return;
+  const ch=w.chambers[b.target];
+
+  if(b.purpose==='hunt'){
+    const need=Math.max(0,camp.pop*FOOD_PER_POP*7.0-camp.food)/MEAT;
+    const take=Math.min(ch.preyPop*HUNT_SHARE,need);
+    ch.preyPop=Math.max(0,ch.preyPop-take);
+    b.carrying.food+=take*MEAT;
+    ch.huntedBy.push(camp.key);
+    if(take<0.6) say(w,`${camp.name} hunt ${ch.name} and find almost nothing.`);
+    else if(tabooAt(w,camp).includes(b.target))
+      say(w,`Starving, ${camp.name} break their own law and hunt ${ch.prey} in ${ch.name}.`,'eco');
+    else say(w,`${camp.name} hunt ${ch.prey} in ${ch.name} — ${take.toFixed(0)} taken.`);
+    if(ch.apex&&ch.pred>0.8&&w.rng()<ch.apex.threat*0.4){
+      const lost=Math.max(1,b.members*0.15);
+      b.members=Math.max(0,b.members-lost);
+      camp.pop=Math.max(MIN_POP,camp.pop-lost);
+      say(w,`${chApex(ch)} falls on the hunting party in ${ch.name}. ${lost.toFixed(0)} do not return.`,'war');
+    }
+  }
+  else if(b.purpose==='settle'){
+    if(!campAt(w,b.target)){
+      camp.holds.push(b.target); camp.lastSettle=w.tick;
+      neighbours(w,b.target).forEach(n=>camp.known.add(n));
+      say(w,`${camp.name} settle ${ch.name}, and now hold ${camp.holds.length} chambers.`,'move');
+    }
+  }
+  else if(b.purpose==='migrate'){
+    if(!campAt(w,b.target)||campAt(w,b.target)===camp){
+      const old=w.chambers[camp.home].name;
+      camp.holds=camp.holds.filter(h=>h!==camp.home);
+      camp.home=b.target; if(!camp.holds.includes(b.target)) camp.holds.push(b.target);
+      camp.def=Math.max(0,camp.def-.2);
+      neighbours(w,b.target).forEach(n=>camp.known.add(n));
+      say(w,`${camp.name} abandon ${old} and move their seat to ${ch.name}.`,'move');
+    }
+  }
+  else if(b.purpose==='raid'){
+    const def=campAt(w,b.target);
+    if(!def||def===camp){ say(w,`${camp.name} arrive at ${ch.name} and find nobody.`,'march'); }
+    else assault(w,b,def,ch);
+  }
+}
+
+function assault(w,band,def,ch){
+  const att=w.camps[band.camp];
+  const attStr=assaultForce(att,band.members)*(att.marchPenalty>0?FORCE_MARCH_PENALTY:1)*(0.8+w.rng()*.4);
+  const defStr=defence(w,def)*(0.8+w.rng()*.4);
+  const attWins=attStr>defStr;
+
+  const loserPool = attWins ? garrison(w,def) : band.members;
+  const losses=Math.max(1,loserPool*(CASUALTY[0]+w.rng()*(CASUALTY[1]-CASUALTY[0])));
+
+  if(attWins){
+    const wasBroken=def.pop<=MIN_POP+0.01;
+    def.pop=Math.max(MIN_POP,def.pop-losses);
+    const attLoss=Math.max(.3,losses*.4);
+    band.members=Math.max(0,band.members-attLoss);
+    att.pop=Math.max(MIN_POP,att.pop-attLoss);
+    const loot=def.food*RAID_LOOT; def.food-=loot; band.carrying.food+=loot;
+    def.def=Math.max(0,def.def-.1);
+    att.last='won'; def.last='lost'; att.since=0; def.since=0;
+    say(w,`${att.name} fall on ${def.name} at ${ch.name} and take the field.`,'war');
+    if(def.pop<=MIN_POP+0.01&&!wasBroken){
+      def.holds=[def.home];
+      say(w,`${def.name} are broken and fall back to ${w.chambers[def.home].name}.`,'big');
+    } else {
+      const spare=def.holds.filter(h=>h!==def.home);
+      if(spare.length&&w.rng()<0.6){
+        const seized=spare[Math.floor(w.rng()*spare.length)];
+        def.holds=def.holds.filter(h=>h!==seized);
+        att.holds.push(seized); att.known.add(seized);
+        say(w,`${ch.name===w.chambers[seized].name?ch.name:w.chambers[seized].name} changes hands to ${att.name}.`,'war');
+      }
+    }
+  } else {
+    // a repulsed band retreats; it is not annihilated
+    const rout=losses*0.6;
+    band.members=Math.max(0,band.members-rout);
+    att.pop=Math.max(MIN_POP,att.pop-rout);
+    def.pop=Math.max(MIN_POP,def.pop-Math.max(.3,losses*.4));
+    att.last='lost'; def.last='won'; att.since=0; def.since=0;
+    say(w,`${att.name} are thrown back from ${ch.name} by ${def.name}.`,'war');
+  }
+}
+
+function bandTick(w){
+  for(const b of [...w.bands]){
+    const camp=w.camps[b.camp];
+    if(!camp||!camp.alive||b.members<0.5){ w.bands=w.bands.filter(x=>x!==b); continue; }
+    if(b.state!=='working'&&b.members>0&&camp.food<=0&&b.route.length>4){
+      // out of provisions on a long march
+      const lost=Math.min(b.members-1,0.4);
+      if(lost>0){ b.members-=lost; camp.pop=Math.max(MIN_POP,camp.pop-lost); }
+    }
+
+    if(b.state==='working'){
+      b.workLeft-=1;
+      if(b.workLeft<=0){
+        doWork(w,b);
+        if(b.purpose==='migrate'){ camp.pop+=0; w.bands=w.bands.filter(x=>x!==b); continue; }
+        b.state='returning'; b.route=[...b.route].reverse(); b.leg=0; b.progress=0;
+      }
+      continue;
+    }
+
+    // travel
+    const speed = camp.marchPenalty>0 && b.state==='returning' ? FORCE_MARCH_SPEED : 1;
+    b.progress+=speed;
+    const from=b.route[b.leg], to=b.route[b.leg+1];
+    if(to===undefined){ // already at the end of the route
+      if(b.state==='outbound'){ b.state='working'; b.workLeft=workFor(b.purpose); }
+      else { bandArrivesHome(w,b); w.bands=w.bands.filter(x=>x!==b); }
+      continue;
+    }
+    if(b.progress>=legCost(w,from,to)){
+      b.leg++; b.progress=0;
+      const here=b.route[b.leg];
+      if(b.purpose==='raid'&&b.state==='outbound'&&b.leg<b.route.length-1)
+        say(w,`A war band of ${camp.name} passes through ${w.chambers[here].name}.`,'march');
+      if(b.leg>=b.route.length-1){
+        if(b.state==='outbound'){ b.state='working'; b.workLeft=workFor(b.purpose); }
+        else { bandArrivesHome(w,b); w.bands=w.bands.filter(x=>x!==b); }
+      }
+    }
+  }
+}
+const workFor=p=>p==='hunt'?HUNT_WORK:p==='raid'?ASSAULT_WORK:p==='settle'?SETTLE_WORK:1;
+
+// a camp under attack recalls its people
+function checkRecall(w){
+  living(w).forEach(c=>{
+    if(c.last==='lost'&&c.since===0){
+      const out=bandsOf(w,c).filter(b=>b.state!=='returning');
+      out.forEach(b=>{
+        b.state='returning'; b.route=b.route.slice(0,b.leg+1).reverse(); b.leg=0; b.progress=0;
+        say(w,`${c.name} recall their band. It force-marches home.`,'march');
+      });
+      if(out.length) c.marchPenalty=FORCE_MARCH_TICKS;
+    }
+    if(c.marchPenalty>0) c.marchPenalty--;
+  });
+}
+
+// ===========================================================================
+// SENSE / SCORE — unchanged except that strength now means who is at home
+// ===========================================================================
+function sense(w,camp){
+  const upkeep=camp.pop*FOOD_PER_POP;
+  const grounds=range(w,camp);
+  const tab=tabooAt(w,camp);
+  const huntable=grounds.reduce((n,k)=>
+    tab.includes(k)?n:n+w.chambers[k].preyPop,0);
+  const scarcity=1-Math.min(1,huntable/Math.max(1,camp.pop*0.8));
+  const rivals=grounds.map(k=>campAt(w,k)).filter(r=>r&&r.key!==camp.key);
+  return {
+    hunger:Math.min(1,Math.max(0,(upkeep*3-camp.food)/(upkeep*3))*0.6+scarcity*0.7),
+    huntable, grounds, rivals, taboo:tab,
+    unexplored:neighbours(w,camp.home).filter(k=>!camp.known.has(k)),
+    open:grounds.filter(k=>k!==camp.home&&!campAt(w,k))
+                .sort((a,b)=>w.chambers[b].preyPop-w.chambers[a].preyPop)
+  };
+}
+const strength=(w,c)=>garrison(w,c)*(1+c.def);
+// One formula for both the decision and the fight. When these drift apart,
+// camps launch raids they were never going to win — attackers lost 93% of
+// assaults because the score and the battle disagreed.
+const defence=(w,c)=>garrison(w,c)*(1+c.def*0.5+w.chambers[c.home].def*0.5);
+const assaultForce=(c,members)=>members*(1+c.def*0.3)*1.15;   // 1.15 = initiative
+
+function score(w,camp,s){
+  const field=canField(w,camp);
+  const sc={grow:W.safeGrow*(s.rivals.length?.4:1)
+                 *((camp.food>camp.pop*1.15&&s.huntable>camp.pop*1.5)?1:0)
+                 *Math.max(0,1-camp.pop/16),
+            fortify:.3, scout:W.curiosity*(s.unexplored.length?1:0)};
+  if(camp.last==='lost'&&camp.since<4) sc.fortify+=W.lossFortify;
+  sc.forage=0.15+W.hungerForage*s.hunger*Math.min(1,w.chambers[camp.home].floraStock/12)*0.45;
+
+  if(field){
+    s.grounds.forEach(k=>{
+      const ch=w.chambers[k]; if(ch.preyCap===0) return;
+      const forbidden=s.taboo.includes(k);
+      if(forbidden&&s.hunger<0.75) return;
+      const need=Math.max(0,camp.pop*FOOD_PER_POP*7.0-camp.food)/MEAT;
+      const take=Math.min(ch.preyPop*HUNT_SHARE,need);
+      const worth=Math.min(1,take*MEAT/Math.max(2,camp.pop*FOOD_PER_POP));
+      const risk=ch.apex?ch.pred*ch.apex.threat*0.35:0;
+      sc['hunt:'+k]=W.hungerHunt*s.hunger*worth-risk
+                    -(k===camp.home?0:0.25*hops(w,camp.home,k))-(forbidden?1.1:0);
+    });
+    if(camp.pop>=9&&camp.food>camp.pop*1.2&&w.tick-camp.lastSettle>=10){
+      claimable(w,camp).slice(0,3).forEach(k=>{
+        sc['settle:'+k]=W.expansion*(w.chambers[k].preyPop/w.chambers[k].preyCap)
+                        *Math.min(1,camp.pop/14)-0.5;
+      });
+    }
+    const here=w.chambers[camp.home];
+    s.open.slice(0,3).forEach(k=>{
+      sc['migrate:'+k]=W.hungerMigrate*s.hunger
+        *((w.chambers[k].preyPop-here.preyPop)/Math.max(4,here.preyCap||4))-.3;
+    });
+    s.rivals.forEach(r=>{
+      const dist=hops(w,camp.home,r.home);
+      const force=assaultForce(camp,garrison(w,camp)*0.65);
+      const dfn=defence(w,r);
+      const weak=force/Math.max(.5,force+dfn);
+      const poaching=s.grounds.some(k=>w.chambers[k].lastHuntedBy.includes(r.key))?1:0;
+      let v=W.hungerRaid*s.hunger+W.weakTempts*(weak-.5)*2+camp.temper*.6
+          +W.lootTempts*Math.min(1,r.food/Math.max(4,camp.pop*2))
+          +W.contestedGround*poaching-W.raidReluctance-W.marchCost*(dist-1);
+      if(camp.last==='won'&&camp.since<4) v+=W.winRaid;
+      if(camp.since<3) v-=W.warWeariness;
+      sc['raid:'+r.key]=v;
+    });
+  }
+  for(const k in sc) sc[k]+=(w.rng()*2-1)*NOISE;
+  return sc;
+}
+
+// ===========================================================================
+// RESOLVE — home actions happen here; everything else becomes a band
+// ===========================================================================
+function resolve(w,intents){
+  Object.values(w.chambers).forEach(ch=>{ch.lastHuntedBy=ch.huntedBy;ch.huntedBy=[]});
+  for(const ck in intents){
+    const camp=w.camps[ck]; if(!camp.alive) continue;
+    const act=intents[ck];
+    if(act==='grow'){camp.pop+=1;camp.food-=2;say(w,`${camp.name} swell in number.`)}
+    else if(act==='fortify'){camp.def=Math.min(1.2,camp.def+.15);
+      say(w,`${camp.name} shore up their defences.`)}
+    else if(act==='scout'){
+      const s=sense(w,camp);
+      if(s.unexplored.length){const t=s.unexplored[Math.floor(w.rng()*s.unexplored.length)];
+        camp.known.add(t); say(w,`${camp.name} scout ${w.chambers[t].name}.`)}}
+    else if(act==='forage'){
+      const ch=w.chambers[camp.home];
+      const gain=Math.min(ch.floraStock*0.3,camp.pop*0.45);
+      ch.floraStock-=gain; camp.food+=gain;
+      say(w,`${camp.name} grub for ${ch.flora} in ${ch.name}.`)}
+    else if(act.startsWith('hunt:'))    sendBand(w,camp,'hunt',act.slice(5),BAND_HUNT_SHARE);
+    else if(act.startsWith('raid:'))    sendBand(w,camp,'raid',w.camps[act.slice(5)].home,BAND_RAID_SHARE);
+    else if(act.startsWith('settle:'))  sendBand(w,camp,'settle',act.slice(7),[0.15,0.25]);
+    else if(act.startsWith('migrate:')) sendBand(w,camp,'migrate',act.slice(8),[0.9,0.95]);
+  }
+  ecologyTick(w);
+  living(w).forEach(c=>{
+    // only the garrison eats from the stores — bands carry their own provisions
+    c.food-=garrison(w,c)*FOOD_PER_POP;
+    if(c.food<0){
+      const lost=Math.min(Math.max(0,c.pop-MIN_POP),Math.abs(c.food)/2);
+      c.pop-=lost;c.food=0;
+      if(lost>0.3) say(w,`${c.name} go hungry and lose ${lost.toFixed(0)}.`)}
+  });
+}
+
+// A hungry apex leaves. Animals migrate; they do not sit still and die.
+function apexMigration(w){
+  const moves=[];
+  for(const ch of Object.values(w.chambers)){
+    if(!ch.apex){ ch.apexHungry=0; continue; }
+    const need=ch.pred*PRED_KILL;
+    const fed=Math.min(1,Math.min(ch.preyPop,need)/Math.max(.1,need));
+    ch.apexHungry = fed<0.6 ? (ch.apexHungry||0)+1 : 0;
+    if(ch.moveCool>0){ ch.moveCool--; continue; }
+    if(ch.apexHungry<3+Math.floor(w.rng()*4)) continue;
+    const options=neighbours(w,ch.key)
+      .filter(k=>w.chambers[k].preyCap>0)
+      .filter(k=>ch.apex.habitat!=='wet'||w.chambers[k].wet)
+      .filter(k=>!w.chambers[k].apex)
+      .sort((a,b)=>w.chambers[b].preyPop-w.chambers[a].preyPop);
+    const best=options[0];
+    // only move for somewhere clearly better, or it thrashes back and forth
+    if(best&&w.chambers[best].preyPop>Math.max(ch.preyPop*1.6,2)) moves.push([ch,w.chambers[best]]);
+  }
+  moves.forEach(([from,to])=>{
+    if(to.apex&&to.pred>=0.25) return;
+    to.apex={...from.apex}; to.pred=from.pred; to.apexHungry=0; to.moveCool=10;
+    const holder=campAt(w,to.key);
+    say(w,`${from.apex.name} abandons ${from.name} and moves into ${to.name}.`,'eco');
+    if(holder) say(w,`${holder.name} now share ${to.name} with ${to.apex.name}.`,'war');
+    from.apex=null; from.pred=0; from.apexHungry=0;
+  });
+}
+
+function ecologyTick(w){
+  apexMigration(w);
+  Object.values(w.chambers).forEach(ch=>{
+    const eaten=Math.min(ch.floraStock,ch.preyPop*GRAZE);
+    ch.floraStock=Math.min(ch.floraCap,
+      ch.floraStock-eaten+ch.floraCap*0.2*(1-ch.floraStock/ch.floraCap));
+    if(ch.preyCap===0) return;
+    const fed=ch.preyPop>0?Math.min(1,eaten/Math.max(.1,ch.preyPop*GRAZE)):0;
+    const births=ch.preyPop*PREY_BIRTH*fed*(1-ch.preyPop/ch.preyCap);
+    const killed=Math.min(ch.preyPop,ch.pred*PRED_KILL);
+    const before=ch.preyPop;
+    ch.preyPop=Math.max(0,ch.preyPop+births-killed);
+    if(ch.apex){
+      const wellFed=Math.min(1,killed/Math.max(.1,ch.pred*PRED_KILL));
+      const before=ch.pred;
+      ch.pred=Math.max(MIN_PRED,ch.pred+ch.pred*(PRED_BIRTH*wellFed-PRED_DEATH));
+      if(ch.pred<=MIN_PRED+0.01&&before>MIN_PRED+0.01)
+        say(w,`${chApex(ch)} grows gaunt in ${ch.name}. One is left.`,'eco');
+      if(w.tick>2&&ch.pred>MIN_PRED*2&&before<=MIN_PRED*2)
+        say(w,`${chApex(ch)} is thriving again in ${ch.name}.`,'eco');}
+    const ratio=ch.preyPop/ch.preyCap;
+    if(!ch.crashed&&ratio<0.12&&before>0.4){ch.crashed=true;
+      say(w,`The ${ch.prey} of ${ch.name} collapse. The chamber is hunted out.`,'eco')}
+    if(ch.crashed&&ratio>0.45){ch.crashed=false;
+      say(w,`The ${ch.prey} of ${ch.name} return.`,'eco')}
+  });
+}
+
+function step(w){
+  w.tick++;
+  bandTick(w);
+  checkRecall(w);
+  const intents={};
+  living(w).forEach(c=>{c.since++;
+    const s=sense(w,c), sc=score(w,c,s);
+    intents[c.key]=Object.keys(sc).reduce((a,b)=>sc[a]>sc[b]?a:b)});
+  resolve(w,intents);
+}
+
+// ===========================================================================
+// RENDER
+// ===========================================================================
+const RAD=ch=>10+Math.sqrt(ch.floraCap)*3.6;
+function bandXY(w,b){
+  const from=w.chambers[b.route[b.leg]];
+  const to=w.chambers[b.route[b.leg+1]];
+  if(!to) return {x:from.x,y:from.y};
+  const t=Math.min(1,b.progress/legCost(w,b.route[b.leg],b.route[b.leg+1]));
+  return {x:from.x+(to.x-from.x)*t, y:from.y+(to.y-from.y)*t};
+}
+function draw(){
+  const w=world; let s='';
+  w.tunnels.forEach(t=>{const a=w.chambers[t[0]],b=w.chambers[t[1]];
+    s+=`<line class="link" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`});
+  CHAMBER_DEFS.forEach(cd=>{
+    const ch=w.chambers[cd.key], r=RAD(ch);
+    const life=ch.floraStock/ch.floraCap;   // fill = how much is growing
+    const held=campAt(w,cd.key);
+    s+=`<g class="node"><circle class="body" cx="${cd.x}" cy="${cd.y}" r="${r}"
+        style="fill:rgba(61,107,82,${(0.10+life*0.55).toFixed(2)});stroke:${held?held.colour:'#241F1A'};stroke-width:${held?4:2}"/>
+      <text class="label" x="${cd.x}" y="${cd.y+r+15}" text-anchor="middle">${cd.name}</text>
+      ${ch.preyCap?`<text class="sub ${ch.crashed?'dead':''}" x="${cd.x}" y="${cd.y+r+28}" text-anchor="middle">${ch.crashed?'hunted out':ch.preyPop.toFixed(0)+' '+ch.prey}</text>`:''}
+      ${ch.pred>0.25?`<text class="sub" x="${cd.x}" y="${cd.y+4}" text-anchor="middle" style="font-size:14px">▲</text>`:''}</g>`;
+  });
+  // camp markers sized by who is actually home
+  living(w).forEach(c=>{
+    const ch=w.chambers[c.home], r=RAD(ch), g=garrison(w,c);
+    s+=`<circle cx="${ch.x+r-3}" cy="${ch.y-r+3}" r="${4+Math.sqrt(Math.max(0,g))*1.5}"
+         fill="${c.colour}" stroke="#241F1A" stroke-width="1.5"/>`;
+  });
+  // bands on the move
+  w.bands.forEach(b=>{
+    const p=bandXY(w,b), c=w.camps[b.camp];
+    const war=b.purpose==='raid';
+    s+=`<circle class="${war?'bandwar':'bandmark'}" cx="${p.x}" cy="${p.y}"
+         r="${4+Math.sqrt(Math.max(0,b.members))*1.1}"
+         fill="${war?c.colour:'none'}" stroke="${war?'#241F1A':c.colour}"/>
+        <text class="bandlabel" x="${p.x}" y="${p.y-9}" text-anchor="middle" fill="${c.colour}">${b.members.toFixed(0)}</text>`;
+  });
+  document.getElementById('map').innerHTML=s;
+  document.getElementById('tickread').innerHTML=`${w.tick} <span>ticks</span>`;
+
+  document.getElementById('roster').innerHTML=CAMP_DEFS.map(cd=>{
+    const c=w.camps[cd.key], g=garrison(w,c), out=away(w,c);
+    return `<div class="row"><span class="swatch" style="background:${cd.colour}"></span>
+      <span>${cd.short}<span class="where"> — ${w.chambers[c.home].name}</span></span>
+      <span class="stat">${g.toFixed(0)}<em> home</em></span>
+      <span class="stat ${out>0?'out':''}">${out.toFixed(0)}<em> out</em></span>
+      <span class="stat">${c.holds.length}<em> held</em></span></div>`}).join('');
+
+  document.getElementById('bands').innerHTML = w.bands.length
+    ? w.bands.map(b=>{const c=w.camps[b.camp];
+        const where = b.state==='working' ? 'working at '+w.chambers[b.target].name
+                    : (b.route[b.leg+1] ? 'between '+w.chambers[b.route[b.leg]].name+' and '+w.chambers[b.route[b.leg+1]].name
+                                        : 'at '+w.chambers[b.route[b.leg]].name);
+        return `<tr><td><b style="color:${c.colour}">${c.short}</b></td>
+          <td class="n">${b.purpose}${b.state==='returning'?', homeward':''}</td>
+          <td class="n">${b.members.toFixed(0)}</td><td class="n">${where}</td></tr>`}).join('')
+    : '<tr><td class="n">Nobody is in the field.</td></tr>';
+
+  document.getElementById('eco').innerHTML=CHAMBER_DEFS.map(cd=>{
+    const ch=w.chambers[cd.key];
+    const f=Math.round(ch.floraStock/ch.floraCap*100);
+    const p=ch.preyCap?Math.round(ch.preyPop/ch.preyCap*100):0;
+    const held=campAt(w,cd.key);
+    const apex = ch.apex&&ch.pred>0.25 ? ch.apex.name+' ('+ch.pred.toFixed(1)+')'
+               : (cd.apex ? '<span class="gone">starved out</span>' : '—');
+    return `<tr>
+      <td><b>${cd.name}</b></td>
+      <td class="n">${cd.flora}</td>
+      <td><span class="bar"><i class="flora" style="width:${f}%"></i></span></td>
+      <td class="${ch.crashed?'crash':'n'}">${ch.preyCap? (ch.crashed?'hunted out':ch.preyPop.toFixed(0)+' '+cd.prey) : '—'}</td>
+      <td>${ch.preyCap?`<span class="bar"><i class="prey" style="width:${p}%"></i></span>`:''}</td>
+      <td class="n">${apex}</td>
+      <td class="n" style="color:${held?held.colour:'inherit'}">${held?held.short:''}</td>
+    </tr>`}).join('');
+
+  const log=document.getElementById('log');
+  if(!w.log.length) log.innerHTML='<p class="empty">Nothing has happened yet. Advance a tick.</p>';
+  else{log.innerHTML=w.log.map(e=>`<div class="entry ${e.kind}"><span class="t">${e.t}</span><span class="body">${e.text}</span></div>`).join('');
+    log.scrollTop=log.scrollHeight}
+}
+// ---------------------------------------------------------------------------
+// SEED SURVEY — run a batch silently and describe what each one turns into
+// ---------------------------------------------------------------------------
+function surveySeed(seed,ticks){
+  const w=makeWorld(seed);
+  for(let i=0;i<ticks;i++) step(w);
+  const L=w.log;
+  const wars=L.filter(e=>e.text.includes('under arms')).length;
+  const won=L.filter(e=>e.text.includes('take the field')).length;
+  const collapses=L.filter(e=>e.text.includes('collapse. The chamber')).length;
+  const moves=L.filter(e=>e.text.includes('abandons')).length;
+  const routs=L.filter(e=>e.text.includes('are broken')).length;
+  const hands=L.filter(e=>e.text.includes('changes hands')).length;
+  const taboo=L.filter(e=>e.text.includes('own law')).length;
+  const camps=living(w).slice().sort((a,b)=>b.pop-a.pop);
+  const top=camps[0], spread=top.pop-(camps[camps.length-1]||top).pop;
+
+  // thresholds set from the measured spread across seeds:
+  // wars 7-18 (median 12) · collapses 4-12 (median 9) · migrations 2-11 (median 7)
+  const low=camps[camps.length-1].pop, high=top.pop;
+  const bits=[];
+
+  if(high<=4)                bits.push('everyone at the brink');
+  else if(low>=9)            bits.push('four camps all thriving');
+  else if(high-low>=10)      bits.push(top.short+' ascendancy');
+  else if(low<=3.5)          bits.push(camps[camps.length-1].short+' reduced to nothing');
+
+  if(routs)                  bits.push('a camp broken outright');
+  else if(hands>=3)          bits.push('borders redrawn repeatedly');
+  else if(wars>=16)          bits.push('relentless raiding');
+  else if(wars<=8)           bits.push('an uneasy peace');
+  else if(won>=4)            bits.push('raids that actually landed');
+
+  if(collapses>=11)          bits.push('the cavern eats itself');
+  else if(collapses<=5)      bits.push('the herds mostly hold');
+
+  if(moves>=10)              bits.push('the beasts never settle');
+  else if(moves<=3)          bits.push('predators stay put');
+  if(taboo>=2)               bits.push('the Assayers break their law twice');
+
+  if(!bits.length)           bits.push('nothing much decided');
+
+  return {seed, wars, collapses, moves,
+          character: bits.slice(0,3).join(' · '),
+          ending: camps.map(c=>c.short+' '+c.pop.toFixed(0)).join(', ')};
+}
+
+function runSurvey(){
+  const base=parseInt(document.getElementById('seed').value||'7',10);
+  const seeds=[]; for(let i=0;i<12;i++) seeds.push((base+i*7)%1000);
+  const rows=seeds.map(sd=>surveySeed(sd,250));
+  document.getElementById('surveypanel').style.display='block';
+  document.getElementById('surveyrows').innerHTML=rows.map(r=>
+    `<tr class="seedrow" data-seed="${r.seed}">
+       <td><b>${r.seed}</b></td><td class="char">${r.character}</td>
+       <td class="n">${r.wars}</td><td class="n">${r.collapses}</td>
+       <td class="n">${r.moves}</td><td class="n">${r.ending}</td></tr>`).join('');
+  document.getElementById('surveypanel').scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.seedrow').forEach(tr=>tr.addEventListener('click',()=>{
+    document.getElementById('seed').value=tr.dataset.seed; reset();
+    document.getElementById('surveypanel').style.display='block';
+    runSurveyRowsKeep(); }));
+}
+let lastSurvey='';
+function runSurveyRowsKeep(){ if(lastSurvey) document.getElementById('surveyrows').innerHTML=lastSurvey; }
+
+function reset(){
+  if(timer){clearInterval(timer);timer=null;document.getElementById('run').textContent='Run'}
+  world=makeWorld(parseInt(document.getElementById('seed').value||'7',10));
+  draw();
+}
+document.getElementById('survey').onclick=function(){
+  this.textContent='Running…';
+  setTimeout(()=>{ runSurvey();
+    lastSurvey=document.getElementById('surveyrows').innerHTML;
+    this.textContent='Survey twelve seeds'; },20);
+};
+document.getElementById('step').onclick=()=>{step(world);draw()};
+document.getElementById('reset').onclick=reset;
+document.getElementById('seed').onchange=reset;
+document.getElementById('run').onclick=function(){
+  if(timer){clearInterval(timer);timer=null;this.textContent='Run';return}
+  this.textContent='Pause';
+  timer=setInterval(()=>{
+    if(world.tick>=300){clearInterval(timer);timer=null;
+      document.getElementById('run').textContent='Run';draw();return}
+    step(world);draw();},400);
+};
+reset();
+</script>
+</body>
+</html>

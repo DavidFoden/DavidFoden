@@ -1,0 +1,24 @@
+name: core tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore standing-order/core/StandingOrder.sln
+
+      - name: Build
+        run: dotnet build standing-order/core/StandingOrder.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test standing-order/core/StandingOrder.sln --no-build --configuration Release --verbosity normal

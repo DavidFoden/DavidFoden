@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deepholt — the region</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--limestone:#D6DAD0;--peat:#241F1A;--peat-soft:#524A42;
+        --malachite:#3D6B52;--ochre:#B5811F;--rust:#9A452B;--slate:#4C6472;--rule:#A9AFA1}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--limestone);color:var(--peat);
+       font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.55}
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 22px 60px}
+  h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(30px,5vw,46px);
+     line-height:1;margin:0 0 10px;letter-spacing:-.01em}
+  .standfirst{color:var(--peat-soft);max-width:62ch;margin:0 0 26px}
+
+  svg{width:100%;height:auto;display:block;background:transparent}
+  .link{stroke:#8E9589;stroke-width:2.5;stroke-linecap:round}
+  .link.fall{stroke:var(--rust);stroke-width:3;stroke-dasharray:6 6}
+  .node{cursor:pointer}
+  .node circle.body{fill:#C2C8BB;stroke:#241F1A;stroke-width:2}
+  .node.held circle.body{stroke-width:4}
+  .node.sel circle.body{fill:#fff}
+  .node text.label{font-size:12.5px;font-weight:600;fill:var(--peat);pointer-events:none}
+  .node text.sub{font-size:10.5px;fill:var(--peat-soft);pointer-events:none}
+  .cistern rect{fill:#241F1A;stroke:#241F1A}
+  .cistern text.label{fill:var(--peat)}
+  .walker{fill:none;stroke:var(--slate);stroke-width:2;stroke-dasharray:1 7;stroke-linecap:round;opacity:.9}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin:14px 0 0;
+          padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+          font-size:13.5px;color:var(--peat-soft)}
+  .legend b{color:var(--peat);font-weight:600}
+  .key{display:flex;align-items:center;gap:8px}
+  .ring{width:14px;height:14px;border-radius:50%;background:#C2C8BB;border:3px solid}
+
+  .detail{margin-top:26px;min-height:120px;border-top:3px solid var(--peat);padding-top:16px}
+  .detail h2{font-family:'Zilla Slab',serif;font-weight:600;font-size:24px;margin:0 0 4px}
+  .detail .who{font-size:13.5px;color:var(--peat-soft);margin:0 0 12px}
+  .detail p{margin:0 0 10px;max-width:66ch}
+  .detail dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;
+             font-size:13.5px;max-width:60ch}
+  .detail dt{color:var(--peat-soft)}
+  .detail dd{margin:0}
+  .prompt{color:var(--peat-soft)}
+
+  .note{margin-top:34px;padding-top:16px;border-top:1px solid var(--rule);
+        color:var(--peat-soft);font-size:13.5px;max-width:70ch}
+  .note b{color:var(--peat)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Deepholt</h1>
+<p class="standfirst">Fifteen chambers, twenty-three tunnels, no corridor. Every camp can be reached by at least two routes, so no two groups meet the cavern in the same order. Tap any chamber.</p>
+
+<svg id="map" viewBox="0 0 900 620" role="img" aria-label="Region map of Deepholt"></svg>
+
+<div class="legend">
+  <span class="key"><span class="ring" style="border-color:#8E9589"></span> unclaimed</span>
+  <span class="key"><span class="ring" style="border-color:#3D6B52"></span> Sporewardens</span>
+  <span class="key"><span class="ring" style="border-color:#9A452B"></span> Ashfang</span>
+  <span class="key"><span class="ring" style="border-color:#4C6472"></span> Mirelurk</span>
+  <span class="key"><span class="ring" style="border-color:#B5811F"></span> Assayers</span>
+  <span class="key"><b>Circle size</b> = how much food the chamber can carry</span>
+  <span class="key"><b>Dotted line</b> = the trader's circuit</span>
+</div>
+
+<div class="detail" id="detail">
+  <p class="prompt">Tap a chamber to read it. The four camps sit far apart on purpose — whichever one you meet first becomes your playthrough's spine.</p>
+</div>
+
+<div class="note">
+  <b>Why the shape matters.</b> A corridor forces the order you meet camps and gives each camp only one or two neighbours, which starves the politics. This layout gives most chambers three connections and several long loops, so camps share contested borders, hunting ranges overlap in more places, and a route you open in the north can change who eats in the south.
+</div>
+
+</div>
+<script>
+const N=[
+ {k:'fissure', n:'The Fissure',        x:130,y:70,  size:1, hold:null, sub:'where you land',
+  d:'A raw crack the earthquake tore through four hundred years of seal. Rubble, daylight for about an hour a day, and no way back up. Nothing lives here yet.'},
+ {k:'rubble',  n:'Rubble Stair',       x:290,y:62,  size:1, hold:null, sub:'',
+  d:'A collapsed dwarven stairway, still passable if you do not mind crawling. The quickest way east, which is also the quickest way to the Ashfang.'},
+ {k:'hollow',  n:'Grimhollow',         x:120,y:210, size:3, hold:null, sub:'cave rothe',
+  d:'Good grazing, a standing herd, and nobody living in it. The richest unclaimed ground in Deepholt, and the first thing worth fighting over once anyone realises it is empty.'},
+ {k:'ashvent', n:'The Ashvents',       x:420,y:95,  size:2, hold:'#9A452B', sub:'Ashfang goblins',
+  d:'Thin, hot, and poor. The Ashfang live badly here, which is exactly why they are the most aggressive thing in the cavern. They are permanently one bad season from moving on somebody.'},
+ {k:'ember',   n:'Ember Galleries',    x:590,y:60,  size:2, hold:null, sub:'',
+  d:'Old dwarven forge halls, long cold. Scrap worth trading, and the Ashfang know it. If your party is ever going to be given a weapon, it comes from here.'},
+ {k:'fungal',  n:'The Fungal Deep',    x:760,y:165, size:5, hold:'#3D6B52', sub:'Sporewardens',
+  d:'The prize. Enormous mats, thirty glowslugs, no predator, and defenders who have never needed to fight. The Sporewardens are devout, well fed, and dangerously easy to disappoint.'},
+ {k:'terrace', n:'Spore Terraces',     x:820,y:315, size:3, hold:null, sub:'',
+  d:'Stepped growing beds the Sporewardens still tend, though they no longer know why they are shaped this way. Sacred ground. Hunt here and their faith in you starts to erode.'},
+ {k:'cistern', n:'The Cistern',        x:450,y:305, size:2, hold:'CISTERN', sub:'the regulator',
+  d:'The dwarven waterworks. It decides what grows and where, which means it decides who eats. Nobody holds it — everybody watches it. The prophecy says you are to be conducted here, though nobody agrees what happens then.'},
+ {k:'gallery', n:'The Long Gallery',   x:280,y:310, size:1, hold:null, sub:'crossroads',
+  d:'A processional hall running most of the width of the hold. Four ways out, no food, no cover. Everyone passes through it and nobody stays.'},
+ {k:'kiln',    n:'The Kiln',           x:120,y:375, size:1, hold:null, sub:'the hermit',
+  d:'A dead firing chamber with someone living in it who is not from any camp. He can read dwarven script, which makes him the only one down here who might tell you what the prophecy actually says.'},
+ {k:'gate',    n:'The Sealed Gate',    x:70, y:495, size:1, hold:null, sub:'the way out',
+  d:'The door the dwarves left by. Shut for four centuries, and it is not rusted shut — it is held. Getting through it is the ending, and it cannot be done without deciding who inherits Deepholt.'},
+ {k:'spine',   n:'Dragonspine Ridge',  x:210,y:530, size:2, hold:'#B5811F', sub:'Assayers',
+  d:'The most defensible ground down here, and among the poorest. The Assayers venerate the ridge dragon and will not touch its goats even while starving. Remote enough that most parties meet them last.'},
+ {k:'weeping', n:'Weeping Stair',      x:430,y:530, size:1, hold:null, sub:'',
+  d:'A wet descent linking south to centre. Slow, loud, and the worst place in the cavern to be caught by something that hunts by sound.'},
+ {k:'sump',    n:'The Black Sump',     x:630,y:495, size:4, hold:'#4C6472', sub:'Mirelurk clan',
+  d:'Three ways in and hard to hold, which has made the Mirelurks traders rather than fighters. They believe nothing and will sell the prophecy to those who do. The only camp that negotiates back.'},
+ {k:'stacks',  n:'Drowned Stacks',     x:815,y:470, size:2, hold:null, sub:'ripper eels',
+  d:'Flooded storage towers. Good fishing if you are willing to share water with the eels, which the Mirelurks are and almost nobody else is.'}
+];
+const E=[
+ ['fissure','rubble'],['fissure','hollow'],['rubble','ashvent'],['rubble','ember'],
+ ['hollow','gallery'],['hollow','kiln'],['ashvent','ember'],['ashvent','cistern'],
+ ['ember','fungal'],['fungal','terrace'],['fungal','cistern'],['terrace','stacks'],
+ ['terrace','sump'],['cistern','gallery'],['cistern','weeping'],['cistern','sump'],
+ ['gallery','kiln'],['gallery','weeping'],['kiln','gate'],['gate','spine'],
+ ['spine','weeping'],['weeping','sump'],['sump','stacks']
+];
+// the trader's circuit — an independent actor with no territory
+const WALK=['gallery','cistern','sump','weeping','gallery'];
+
+const at=k=>N.find(n=>n.k===k);
+const R=s=>({1:15,2:20,3:26,4:31,5:37})[s];
+let sel=null;
+
+function draw(){
+  let s='';
+  E.forEach(([a,b])=>{const p=at(a),q=at(b);
+    s+=`<line class="link" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`});
+  // the fall
+  s+=`<line class="link fall" x1="${at('fissure').x}" y1="12" x2="${at('fissure').x}" y2="${at('fissure').y-R(1)}"/>`;
+  s+=`<text x="${at('fissure').x+10}" y="20" style="font-size:11.5px;fill:#9A452B;font-weight:600">you fall in here</text>`;
+  // trader circuit
+  let d='';
+  WALK.forEach((k,i)=>{const p=at(k);d+=(i?'L':'M')+p.x+' '+p.y+' '});
+  s+=`<path class="walker" d="${d}"/>`;
+
+  N.forEach(n=>{
+    const r=R(n.size), held=n.hold&&n.hold!=='CISTERN';
+    const cls=`node${held?' held':''}${sel===n.k?' sel':''}${n.hold==='CISTERN'?' cistern':''}`;
+    s+=`<g class="${cls}" data-k="${n.k}" tabindex="0" role="button" aria-label="${n.n}">`;
+    if(n.hold==='CISTERN'){
+      s+=`<rect x="${n.x-r}" y="${n.y-r}" width="${r*2}" height="${r*2}"
+            transform="rotate(45 ${n.x} ${n.y})" fill="${sel===n.k?'#fff':'#C2C8BB'}"
+            stroke="#241F1A" stroke-width="4"/>`;
+    } else {
+      s+=`<circle class="body" cx="${n.x}" cy="${n.y}" r="${r}"
+            style="stroke:${held?n.hold:'#241F1A'}"/>`;
+    }
+    s+=`<text class="label" x="${n.x}" y="${n.y+r+16}" text-anchor="middle">${n.n}</text>`;
+    if(n.sub) s+=`<text class="sub" x="${n.x}" y="${n.y+r+30}" text-anchor="middle">${n.sub}</text>`;
+    s+=`</g>`;
+  });
+  document.getElementById('map').innerHTML=s;
+  document.querySelectorAll('.node').forEach(g=>{
+    const go=()=>{sel=g.dataset.k;draw();show()};
+    g.addEventListener('click',go);
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+  });
+}
+
+function routes(k){
+  // count distinct first steps that eventually reach the fissure — a crude
+  // "how many ways in" figure, which is the thing the layout is for
+  return E.filter(e=>e.includes(k)).length;
+}
+
+function show(){
+  const n=at(sel);
+  const holder=n.hold==='CISTERN'?'Held by nobody. Wanted by everyone.'
+    :n.hold?`Held by ${n.sub}`:'Unclaimed';
+  document.getElementById('detail').innerHTML=`
+    <h2>${n.n}</h2>
+    <p class="who">${holder}</p>
+    <p>${n.d}</p>
+    <dl><dt>Tunnels</dt><dd>${routes(n.k)}</dd>
+        <dt>Carrying capacity</dt><dd>${['—','very low','low','fair','good','the richest in Deepholt'][n.size]}</dd></dl>`;
+}
+draw();
+</script>
+</body>
+</html>
